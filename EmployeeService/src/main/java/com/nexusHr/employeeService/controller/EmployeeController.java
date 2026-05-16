@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nexusHr.authService.entity.AuthResponse;
 import com.nexusHr.authService.entity.LoginRequest;
+import com.nexusHr.authService.entity.SignupRequest;
 import com.nexusHr.authService.service.AuthService;
 import com.nexusHr.employeeService.entity.Employee;
 import com.nexusHr.employeeService.service.EmployeeService;
@@ -29,6 +30,11 @@ public class EmployeeController {
 
 	@Autowired
 	private AuthService authService;
+
+	@PostMapping("/signup")
+	public String signup(@RequestBody SignupRequest req) {
+		return authService.signup(req);
+	}
 
 	@PostMapping("/login")
 	public AuthResponse login(@RequestBody LoginRequest req) {
