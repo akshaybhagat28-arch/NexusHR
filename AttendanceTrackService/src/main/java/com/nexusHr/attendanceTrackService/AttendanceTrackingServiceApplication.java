@@ -9,6 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 public class AttendanceTrackingServiceApplication {
 
 	public static void main(String[] args) {
+		System.out.println("AttendanceTrackingServiceApplication");
 		SpringApplication.run(AttendanceTrackingServiceApplication.class, args);
 	}
 }
