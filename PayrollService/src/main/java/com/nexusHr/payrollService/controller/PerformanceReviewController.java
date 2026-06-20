@@ -1,48 +1,56 @@
 package com.nexusHr.payrollService.controller;
 
-import com.nexusHr.payrollService.entity.PerformanceReview;
-import com.nexusHr.payrollService.service.PerformanceReviewService;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+import com.nexusHr.payrollService.entity.PerformanceReview;
+import com.nexusHr.payrollService.entity.PerformanceReviewDTO;
+import com.nexusHr.payrollService.service.PerformanceReviewService;
+
 
 @RestController
 @RequestMapping("/api/reviews")
+@CrossOrigin(origins = "http://localhost:5173")
 public class PerformanceReviewController {
 
 	@Autowired
-	private PerformanceReviewService service;
+	private PerformanceReviewService reviewService;
 
-	// CREATE review
+	// Add Review
 	@PostMapping
-	public PerformanceReview createReview(@RequestBody PerformanceReview review) {
-		return service.saveReview(review);
+	public PerformanceReview addReview(@RequestBody PerformanceReviewDTO dto) {
+		
+		return reviewService.addReview(dto);
 	}
-
-	// GET all reviews
+	
 	@GetMapping
-	public List<PerformanceReview> getAllReviews() {
-		return service.getAllReviews();
+	public List<PerformanceReviewDTO> getALLReview(){
+		System.out.println(reviewService.getALLReview().toString());
+		return reviewService.getALLReview();
 	}
 
-	// GET review by ID
-	@GetMapping("/{id}")
-	public Optional<PerformanceReview> getReviewById(@PathVariable Long id) {
-		return service.getReviewById(id);
+	// Get Average Rating
+	@GetMapping("/average/{employeeId}")
+	public Double getAverageRating(@PathVariable Long employeeId) {
+
+		return reviewService.getAverageRating(employeeId);
 	}
 
-	// GET reviews by employee ID
-	@GetMapping("/employee/{employeeId}")
-	public List<PerformanceReview> getByEmployee(@PathVariable Long employeeId) {
-		return service.getReviewsByEmployeeId(employeeId);
-	}
+	// Get Performance Level
+	@GetMapping("/performance/{employeeId}")
+	public String getPerformance(@PathVariable Long employeeId) {
 
-	// DELETE review
-	@DeleteMapping("/{id}")
-	public String deleteReview(@PathVariable Long id) {
-		service.deleteReview(id);
-		return "Review deleted successfully";
+		Double rating = reviewService.getAverageRating(employeeId);
+
+		return reviewService.getPerformanceLevel(rating);
 	}
+	
+	@DeleteMapping("delete/{id}")
+	public String deleteReivew(@PathVariable Long id) {
+		return reviewService.deleteReview(id);
+	}
+	
+	
 }

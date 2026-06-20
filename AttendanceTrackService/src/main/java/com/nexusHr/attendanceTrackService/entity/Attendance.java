@@ -3,25 +3,51 @@ package com.nexusHr.attendanceTrackService.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.nexusHr.employeeService.entity.Employee;
+
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "attendance")
 public class Attendance {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private String employeeEmail;
+
+	private Long empId;
+
 	private LocalDate attendanceDate;
+
 	private LocalDateTime checkInTime;
+
 	private LocalDateTime checkOutTime;
+
+	private String employeeEmail;
+
 	private String status;
 
 	public Attendance() {
+	}
+
+	public Attendance(Long id, Long empId, LocalDate attendanceDate, LocalDateTime checkInTime,
+			LocalDateTime checkOutTime, String employeeEmail, String status) {
+		super();
+		this.id = id;
+		this.empId = empId;
+		this.attendanceDate = attendanceDate;
+		this.checkInTime = checkInTime;
+		this.checkOutTime = checkOutTime;
+		this.employeeEmail = employeeEmail;
+		this.status = status;
+	}
+
+	public String getEmployeeEmail() {
+		return employeeEmail;
+	}
+
+	public void setEmployeeEmail(String employeeEmail) {
+		this.employeeEmail = employeeEmail;
 	}
 
 	public Long getId() {
@@ -32,12 +58,12 @@ public class Attendance {
 		this.id = id;
 	}
 
-	public String getEmployeeEmail() {
-		return employeeEmail;
+	public Long getEmpId() {
+		return empId;
 	}
 
-	public void setEmployeeEmail(String employeeEmail) {
-		this.employeeEmail = employeeEmail;
+	public void setEmpId(Long empId) {
+		this.empId = empId;
 	}
 
 	public LocalDate getAttendanceDate() {
@@ -71,5 +97,4 @@ public class Attendance {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-
 }

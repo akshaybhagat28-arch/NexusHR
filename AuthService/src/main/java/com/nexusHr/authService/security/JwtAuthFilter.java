@@ -32,10 +32,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 
 		String path = request.getServletPath();
-		// PUBLIC APIs SKIP
-		if (path.startsWith("/api/auth/") || path.startsWith("/api/payroll/")) {
+
+		// SKIP AUTH APIs
+		if (path.startsWith("/api/auth/login") || path.startsWith("/api/attendance/login")
+				|| path.startsWith("/api/attendance/signup") || path.startsWith("/api/leaves/login")
+				|| path.startsWith("/api/leaves/signup") || path.startsWith("/api/payroll/signup")
+				|| path.startsWith("/api/payroll/login")) {
 
 			filterChain.doFilter(request, response);
+
 			return;
 		}
 
@@ -46,28 +51,28 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 			String token = null;
 			String username = null;
 
-			// STEP 1: Check token
+			// CHECK TOKEN
 			if (authHeader != null && authHeader.startsWith("Bearer ")) {
+
 				token = authHeader.substring(7);
+
 				username = jwtService.extractUsername(token);
 			}
 
-			// ❌ NO TOKEN → continue request normally (permitAll works)
+			// TOKEN NOT FOUND
 			if (username == null) {
-				filterChain.doFilter(request, response);
+
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+				response.getWriter().write("Token Missing");
+
 				return;
 			}
 
-			// STEP 2: If already authenticated
-			if (SecurityContextHolder.getContext().getAuthentication() != null) {
-				filterChain.doFilter(request, response);
-				return;
-			}
-
-			// STEP 3: Load user
+			// LOAD USER
 			UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-			// STEP 4: Validate token
+			// VALIDATE TOKEN
 			if (jwtService.validateToken(token, userDetails)) {
 
 				UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
@@ -78,7 +83,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 				SecurityContextHolder.getContext().setAuthentication(authToken);
 
 			} else {
-				sendError(response, 401, "Invalid token");
+
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+				response.getWriter().write("Invalid Token");
+
 				return;
 			}
 
@@ -88,18 +97,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
 			e.printStackTrace();
 
-			if (!response.isCommitted()) {
-				sendError(response, 500, e.toString());
-			}
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+			response.getWriter().write("Authentication Failed");
 		}
-	}
-
-	// ✅ CLEAN RESPONSE METHOD
-	private void sendError(HttpServletResponse response, int status, String message) throws IOException {
-
-		response.setStatus(status);
-		response.setContentType("application/json");
-
-		response.getWriter().write("{" + "\"status\":" + status + "," + "\"message\":\"" + message + "\"" + "}");
 	}
 }

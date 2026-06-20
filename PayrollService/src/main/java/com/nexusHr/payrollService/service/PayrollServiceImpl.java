@@ -5,6 +5,8 @@ import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.FontFactory;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.nexusHr.employeeService.entity.Employee;
@@ -19,6 +21,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -41,56 +45,62 @@ public class PayrollServiceImpl implements PayrollService {
 	@Override
 	public Payroll generatePayroll(Long employeeId, String month) {
 
-		Employee employee = employeeRepository.findById(employeeId)
-				.orElseThrow(() -> new RuntimeException("Employee not found"));
+	    Employee employee =
+	            employeeRepository.findById(employeeId)
+	            .orElseThrow(() ->
+	                    new RuntimeException("Employee not found"));
 
-		List<LeaveRequest> unpaidLeaves = leaveRepository.findByEmployeeIdAndPaidFalse(employeeId);
+	    int monthNumber =
+	            Month.valueOf(month.toUpperCase()).getValue();
 
-		int totalUnpaidDays = unpaidLeaves.stream().mapToInt(l -> l.getTotalDays() != null ? l.getTotalDays() : 0)
-				.sum();
+	    int year = LocalDate.now().getYear();
 
-		double basicSalary = Optional.ofNullable(employee.getBasicSalary()).orElse(0.0);
+	    // Total days in selected month
+	    int totalWorkingDays =
+	            YearMonth.of(year, monthNumber).lengthOfMonth();
 
-		Integer workingDays = employee.getTotalWorkingDays();
+	    // Approved leaves
+	    List<LeaveRequest> leaves =
+	            leaveRepository.getApprovedLeavesByMonth(
+	                    employeeId,
+	                    monthNumber);
 
-		if (workingDays == null || workingDays <= 0) {
-			throw new RuntimeException("Invalid total working days");
-		}
+	    int leavesTaken = leaves.stream()
+	            .mapToInt(LeaveRequest::getTotalDays)
+	            .sum();
 
-		// unpaid leave working days se jyada nahi hone chahiye
-		if (totalUnpaidDays > workingDays) {
-			totalUnpaidDays = workingDays;
-		}
+	    // Salary
+	    double grossSalary = employee.getBasicSalary();
 
-		// per day salary
-		double perDaySalary = basicSalary / workingDays;
+	    // Per day salary
+	    double perDaySalary =
+	            grossSalary / totalWorkingDays;
 
-		// leave deduction
-		double deduction = perDaySalary * totalUnpaidDays;
+	    // Deduction
+	    double leaveDeduction =
+	            perDaySalary * leavesTaken;
 
-		// rounding
-		deduction = Math.round(deduction * 100.0) / 100.0;
+	    // Net salary
+	    double netSalary =
+	            grossSalary - leaveDeduction;
 
-		// net salary
-		double netSalary = basicSalary - deduction;
+	    Payroll payroll = new Payroll();
 
-		// rounding
-		netSalary = Math.round(netSalary * 100.0) / 100.0;
+	    payroll.setEmployee(employee);
 
-		// negative salary avoid
-		if (netSalary < 0) {
-			netSalary = 0;
-		}
+	    payroll.setMonth(month);
 
-		Payroll payroll = new Payroll();
-		payroll.setEmployee(employee);
-		payroll.setMonth(month);
-		payroll.setGrossSalary(basicSalary);
-		payroll.setLeaveDeduction(deduction);
-		payroll.setNetSalary(netSalary);
-		payroll.setGeneratedDate(LocalDate.now());
+	    payroll.setGeneratedDate(LocalDate.now());
 
-		return payrollRepository.save(payroll);
+	    payroll.setGrossSalary(grossSalary);
+
+	    payroll.setLeaveDeduction(
+	            (double) Math.round(leaveDeduction));
+
+	    payroll.setNetSalary(
+	            (double) Math.round(netSalary));
+
+	    return payrollRepository.save(payroll);
 	}
 
 	@Override
@@ -127,10 +137,27 @@ public class PayrollServiceImpl implements PayrollService {
 	@Override
 	public byte[] generatePayslip(Long employeeId, String month) throws Exception {
 
-		// Payroll generate karo
+		// Payroll generate
 		Payroll payroll = generatePayroll(employeeId, month);
 
 		Employee employee = payroll.getEmployee();
+
+		// Month convert
+		int monthNumber = Month.valueOf(month.toUpperCase()).getValue();
+
+		int year = LocalDate.now().getYear();
+
+		// Total working days
+		int totalWorkingDays = YearMonth.of(year, monthNumber).lengthOfMonth();
+
+		// Approved leaves of selected month
+		List<LeaveRequest> leaves = leaveRepository.getApprovedLeavesByMonth(employeeId, monthNumber);
+
+		// Total leaves taken
+		int leavesTaken = leaves.stream().mapToInt(LeaveRequest::getTotalDays).sum();
+
+		// Present days
+		int presentDays = totalWorkingDays - leavesTaken;
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -140,7 +167,8 @@ public class PayrollServiceImpl implements PayrollService {
 
 		document.open();
 
-		// Title
+		// ===== TITLE =====
+
 		Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20);
 
 		Paragraph title = new Paragraph("EMPLOYEE PAYSLIP", titleFont);
@@ -151,13 +179,22 @@ public class PayrollServiceImpl implements PayrollService {
 
 		document.add(new Paragraph(" "));
 
+		// ===== DATE =====
+
 		LocalDate date = payroll.getGeneratedDate();
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
 		String formattedDate = date.format(formatter);
 
-		// Employee Details
+		// ===== EMPLOYEE DETAILS =====
+
+		Font headingFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14);
+
+		document.add(new Paragraph("Employee Details", headingFont));
+
+		document.add(new Paragraph(" "));
+
 		document.add(new Paragraph("Employee ID : " + employee.getId()));
 
 		document.add(new Paragraph("Employee Name : " + employee.getFirstName() + " " + employee.getLastName()));
@@ -172,10 +209,45 @@ public class PayrollServiceImpl implements PayrollService {
 
 		document.add(new Paragraph(" "));
 
-		// Salary Table
+		// ===== ATTENDANCE DETAILS =====
+
+		document.add(new Paragraph("Attendance Details", headingFont));
+
+		document.add(new Paragraph(" "));
+
+		document.add(new Paragraph("Total Working Days : " + totalWorkingDays));
+
+		document.add(new Paragraph("Leaves Taken : " + leavesTaken));
+
+		document.add(new Paragraph("Present Days : " + presentDays));
+
+		document.add(new Paragraph(" "));
+
+		// ===== SALARY TABLE =====
+
+		document.add(new Paragraph("Salary Details", headingFont));
+
+		document.add(new Paragraph(" "));
+
 		PdfPTable table = new PdfPTable(2);
 
 		table.setWidthPercentage(100);
+
+		table.setSpacingBefore(10f);
+
+		table.setSpacingAfter(10f);
+
+		// Header Font
+		Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
+
+		PdfPCell cell1 = new PdfPCell(new Phrase("Description", headerFont));
+
+		PdfPCell cell2 = new PdfPCell(new Phrase("Amount", headerFont));
+
+		table.addCell(cell1);
+		table.addCell(cell2);
+
+		// Salary Rows
 
 		table.addCell("Gross Salary");
 		table.addCell(String.valueOf(payroll.getGrossSalary()));
@@ -189,7 +261,16 @@ public class PayrollServiceImpl implements PayrollService {
 		document.add(table);
 
 		document.add(new Paragraph(" "));
-		document.add(new Paragraph("This is system generated payslip."));
+
+		// ===== FOOTER =====
+
+		Font footerFont = FontFactory.getFont(FontFactory.HELVETICA_OBLIQUE, 10);
+
+		Paragraph footer = new Paragraph("This is system generated payslip.", footerFont);
+
+		footer.setAlignment(Element.ALIGN_CENTER);
+
+		document.add(footer);
 
 		document.close();
 

@@ -8,7 +8,8 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 @ComponentScan(basePackages = {
 	    "com.nexusHr.authService",
-	    "com.nexusHr.employeeService"
+	    "com.nexusHr.employeeService",
+	    "com.nexusHr.attendanceTrackService"
 	})
 public class PayrollServiceApplication {
 

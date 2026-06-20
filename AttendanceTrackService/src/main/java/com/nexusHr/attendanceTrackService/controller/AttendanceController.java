@@ -1,30 +1,56 @@
 package com.nexusHr.attendanceTrackService.controller;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.nexusHr.attendanceTrackService.entity.Attendance;
 import com.nexusHr.attendanceTrackService.service.AttendanceService;
+import com.nexusHr.authService.entity.AuthResponse;
+import com.nexusHr.authService.entity.LoginRequest;
+import com.nexusHr.authService.entity.SignupRequest;
+import com.nexusHr.authService.service.AuthService;
 
 @RestController
 @RequestMapping("/api/attendance")
 public class AttendanceController {
 
-    @Autowired
-    private AttendanceService attendanceService;
+	@Autowired
+	private AttendanceService attendanceService;
 
-    @GetMapping("/checkin")
-    public Attendance checkIn(@RequestParam String email) {
-        return attendanceService.checkIn(email);
-    }
+	@Autowired
+	AuthService authService;
 
-    @PostMapping("/checkout")
-    public Attendance checkOut(@RequestParam String email) {
-        return attendanceService.checkOut(email);
-    }
+	@PostMapping("/signup")
+	public String signup(@RequestBody SignupRequest req) {
+		return authService.signup(req);
+	}
 
-    @GetMapping
-    public Attendance get(@RequestParam String email) {
-        return attendanceService.getAttendance(email);
-    }
+	@PostMapping("/login")
+	public AuthResponse login(@RequestBody LoginRequest req) {
+		return authService.login(req);
+	}
+
+	@PostMapping("/checkin")
+	public Attendance checkIn(@RequestParam Long empId) {
+		return attendanceService.checkIn(empId);
+	}
+
+	@PostMapping("/checkout")
+	public Attendance checkOut(@RequestParam Long empId) {
+		return attendanceService.checkOut(empId);
+	}
+
+	@GetMapping("/get/{empId}")
+	public Optional<Attendance> get(@PathVariable Long empId) {
+
+		return attendanceService.getAttendanceByEmpId(empId);
+	}
+
+	@GetMapping
+	public List<Attendance> getAll() {
+		return attendanceService.getAttendanceAll();
+	}
 }

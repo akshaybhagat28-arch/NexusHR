@@ -69,6 +69,7 @@ public class AuthService {
 		authResponse.setAccessToken(accessToken);
 		authResponse.setRefreshToken(refreshToken);
 		authResponse.setRole(user.getRole());
+		authResponse.setUsername(user.getUsername());
 
 		return authResponse;
 	}

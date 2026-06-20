@@ -1,94 +1,107 @@
 package com.nexusHr.employeeService.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "employees")
 public class Employee {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	private String firstName;
-	private String lastName;
-	private String email;
-	private Double basicSalary;
-	private Integer totalWorkingDays;
+    private String firstName;
 
-	@ManyToOne
-	@JoinColumn(name = "department_id")
-	private Department department;
+    private String lastName;
 
-	public Employee() {
-	}
+    private String email;
 
-	public Employee(Long id, String firstName, String lastName, String email, Double basicSalary,
-			Integer totalWorkingDays, Department department) {
-		super();
-		this.id = id;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.email = email;
-		this.basicSalary = basicSalary;
-		this.totalWorkingDays = totalWorkingDays;
-		this.department = department;
-	}
+    private Double basicSalary;
 
-	public Long getId() {
-		return id;
-	}
+    private Integer totalWorkingDays;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    // DEPARTMENT MAPPING
+    @ManyToOne
+    @JoinColumn(name = "department_id")
 
-	public String getFirstName() {
-		return firstName;
-	}
+    @JsonIgnore
+    private Department department;
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+    public Employee() {
+    }
 
-	public String getLastName() {
-		return lastName;
-	}
+    public Employee(Long id,
+                    String firstName,
+                    String lastName,
+                    String email,
+                    Double basicSalary,
+                    Integer totalWorkingDays,
+                    Department department) {
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.basicSalary = basicSalary;
+        this.totalWorkingDays = totalWorkingDays;
+        this.department = department;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public Double getBasicSalary() {
-		return basicSalary;
-	}
+    public String getFirstName() {
+        return firstName;
+    }
 
-	public void setBasicSalary(Double basicSalary) {
-		this.basicSalary = basicSalary;
-	}
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
-	public Integer getTotalWorkingDays() {
-		return totalWorkingDays;
-	}
+    public String getLastName() {
+        return lastName;
+    }
 
-	public void setTotalWorkingDays(Integer totalWorkingDays) {
-		this.totalWorkingDays = totalWorkingDays;
-	}
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
-	public Department getDepartment() {
-		return department;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public void setDepartment(Department department) {
-		this.department = department;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
+    public Double getBasicSalary() {
+        return basicSalary;
+    }
+
+    public void setBasicSalary(Double basicSalary) {
+        this.basicSalary = basicSalary;
+    }
+
+    public Integer getTotalWorkingDays() {
+        return totalWorkingDays;
+    }
+
+    public void setTotalWorkingDays(Integer totalWorkingDays) {
+        this.totalWorkingDays = totalWorkingDays;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
 }

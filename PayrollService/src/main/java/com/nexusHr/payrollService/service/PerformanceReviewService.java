@@ -1,20 +1,20 @@
 package com.nexusHr.payrollService.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import com.nexusHr.payrollService.entity.PerformanceReview;
+import com.nexusHr.payrollService.entity.PerformanceReviewDTO;
 
 public interface PerformanceReviewService {
 
-	public PerformanceReview saveReview(PerformanceReview review);
+	public PerformanceReview addReview(PerformanceReviewDTO dto);
 
-	public List<PerformanceReview> getAllReviews();
+	public Double getAverageRating(Long employeeId);
 
-	public Optional<PerformanceReview> getReviewById(Long id);
+	public String getPerformanceLevel(Double rating);
 
-	public List<PerformanceReview> getReviewsByEmployeeId(Long employeeId);
+	public String deleteReview(Long id);
 
-	public void deleteReview(Long id);
+	public List<PerformanceReviewDTO> getALLReview();
 
 }

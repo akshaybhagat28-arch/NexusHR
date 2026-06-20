@@ -14,7 +14,7 @@ import com.nexusHr.authService.repository.UserRepository;
 import com.nexusHr.employeeService.entity.Employee;
 import com.nexusHr.employeeService.repository.EmployeeRepository;
 import com.nexusHr.leaveManagementService.entity.LeaveRequest;
-import com.nexusHr.leaveManagementService.entity.LeaveResponse;
+import com.nexusHr.leaveManagementService.entity.LeaveRequestDto;
 import com.nexusHr.leaveManagementService.entity.LeaveStatus;
 import com.nexusHr.leaveManagementService.repository.LeaveRequestRepository;
 
@@ -31,14 +31,14 @@ public class LeaveServiceImpl implements LeaveService {
 	private UserRepository userRepository;
 
 	@Override
-	public LeaveRequest applyLeave(LeaveRequest leaveRequest) {
+	public LeaveRequest applyLeave(LeaveRequestDto dto) {
 
 	    Employee employee = employeeRepository.findById(
-	            leaveRequest.getEmployee().getId()
+	    		dto.getEmployeeId()
 	    ).orElseThrow(() -> new RuntimeException("Employee not found"));
 
-	    LocalDate startDate = leaveRequest.getStartDate();
-	    LocalDate endDate = leaveRequest.getEndDate();
+	    LocalDate startDate = dto.getStartDate();
+	    LocalDate endDate = dto.getEndDate();
 
 	    if (startDate == null || endDate == null) {
 	        throw new RuntimeException("Start date and end date required");
@@ -51,8 +51,12 @@ public class LeaveServiceImpl implements LeaveService {
 	    // auto calculate total leave days
 	    int totalDays = (int) ChronoUnit.DAYS.between(startDate, endDate) + 1;
 
-	    leaveRequest.setEmployee(employee);
+	    LeaveRequest leaveRequest = new LeaveRequest();
+		leaveRequest .setEmployee(employee);
+		leaveRequest.setStartDate(startDate);
+		leaveRequest.setEndDate(endDate);
 	    leaveRequest.setTotalDays(totalDays);
+	    leaveRequest.setReason(dto.getReason());
 	    leaveRequest.setPaid(false);
 	    leaveRequest.setStatus(LeaveStatus.PENDING);
 
@@ -87,8 +91,8 @@ public class LeaveServiceImpl implements LeaveService {
 	}
 
 	@Override
-	public List<LeaveRequest> getAllLeaves() {
-		return leaveRequestRepository.findAll();
+	public List<Object[]> getAllLeaves() {
+		return leaveRequestRepository.getLeaveRequestsWithEmployeeName();
 	}
 
 }

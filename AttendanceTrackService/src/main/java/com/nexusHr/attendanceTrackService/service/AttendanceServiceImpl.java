@@ -3,10 +3,14 @@ package com.nexusHr.attendanceTrackService.service;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.nexusHr.attendanceTrackService.entity.Attendance;
 import com.nexusHr.attendanceTrackService.repository.AttendanceRepository;
@@ -20,47 +24,37 @@ public class AttendanceServiceImpl implements AttendanceService {
 	@Autowired
 	private RedisTemplate<String, Object> redisTemplate;
 
-	// CHECK-IN
-	public Attendance checkIn(String email) {
+	public Attendance checkIn(Long empId) {
 
 		LocalDate today = LocalDate.now();
-		String key = buildKey(email, today);
-
-		System.out.println("CHECKIN KEY => " + key);
 
 		// 🔥 Atomic lock (prevents duplicate)
-		Boolean isNew = redisTemplate.opsForValue().setIfAbsent(key, "LOCK", Duration.ofHours(24));
+		Boolean isNew = redisTemplate.opsForValue().setIfAbsent(String.valueOf(empId), "CHECKED_IN", Duration.ofHours(12));
 
 		if (Boolean.FALSE.equals(isNew)) {
-			throw new RuntimeException("Already checked in today");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Already checked in today");
 		}
 
 		Attendance attendance = new Attendance();
-		attendance.setEmployeeEmail(email);
+		attendance.setEmpId(empId);
 		attendance.setAttendanceDate(today);
 		attendance.setCheckInTime(LocalDateTime.now());
 		attendance.setStatus("PRESENT");
 
 		Attendance saved = attendanceRepository.save(attendance);
 
-		// Save in Redis
-		redisTemplate.opsForValue().set(key, saved, Duration.ofHours(24));
-
-		System.out.println("SAVED IN REDIS => " + key);
-
 		return saved;
 	}
 
 	// CHECK-OUT
-	public Attendance checkOut(String email) {
+	public Attendance checkOut(Long empId) {
 
 		LocalDate today = LocalDate.now();
-		String key = buildKey(email, today);
 
-		Attendance attendance = (Attendance) redisTemplate.opsForValue().get(key);
+		Attendance attendance = (Attendance) redisTemplate.opsForValue().get("CHECKIN_" + empId);
 
 		if (attendance == null) {
-			attendance = attendanceRepository.findByEmployeeEmailAndAttendanceDate(email, today);
+			attendance = attendanceRepository.findByEmpIdAndAttendanceDate(empId, today);
 		}
 
 		attendance.setCheckOutTime(LocalDateTime.now());
@@ -74,28 +68,21 @@ public class AttendanceServiceImpl implements AttendanceService {
 
 		Attendance updated = attendanceRepository.save(attendance);
 
-		redisTemplate.opsForValue().set(key, updated, Duration.ofHours(24));
-
 		return updated;
 	}
 
-	// GET ATTENDANCE
-	public Attendance getAttendance(String email) {
+	// GET ATTENDANCE BY ID
+	public Optional<Attendance> getAttendanceByEmpId(Long empId) {
 
-		LocalDate today = LocalDate.now();
-		String key = buildKey(email, today);
-
-		Object cached = redisTemplate.opsForValue().get(key);
-
-		if (cached != null) {
-			return (Attendance) cached;
-		}
-
-		return attendanceRepository.findByEmployeeEmailAndAttendanceDate(email, today);
+	    return attendanceRepository.findByEmpId(empId);
 	}
 
-	// KEY BUILDER
-	private String buildKey(String email, LocalDate date) {
-		return "attendance:" + email + ":" + date;
+
+	
+
+	public List<Attendance> getAttendanceAll() {
+		return attendanceRepository.findAll();
 	}
+
+	
 }

@@ -34,14 +34,20 @@ public class PerformanceReview {
 	public PerformanceReview() {
 	}
 
-	public PerformanceReview(Employee employee, Employee reviewer, Integer rating, String feedback,
+	
+
+	public PerformanceReview(Long id, Employee employee, Employee reviewer, Integer rating, String feedback,
 			LocalDate reviewDate) {
+		super();
+		this.id = id;
 		this.employee = employee;
 		this.reviewer = reviewer;
 		this.rating = rating;
 		this.feedback = feedback;
 		this.reviewDate = reviewDate;
 	}
+
+
 
 	// Getters and Setters
 	public Long getId() {
