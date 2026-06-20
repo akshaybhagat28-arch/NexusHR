@@ -70,23 +70,25 @@ public class SecurityConfig {
 
 	// CORS CONFIG
 	@Bean
-	CorsConfigurationSource corsConfigurationSource() {
+	 CorsConfigurationSource corsConfigurationSource() {
 
-		CorsConfiguration configuration = new CorsConfiguration();
+	    CorsConfiguration configuration = new CorsConfiguration();
 
-		configuration.setAllowedOrigins(List.of("https://nexus-hr-project.vercel.app"));
+	    configuration.setAllowedOrigins(List.of(
+	        "http://localhost:5173",
+	        "https://nexus-hr-project-oaqh7c02-akshaybhagat28-1992s-projects.vercel.app"
+	    ));
 
-		configuration.setAllowedMethods(List.of("*"));
+	    configuration.setAllowedMethods(List.of("*"));
+	    configuration.setAllowedHeaders(List.of("*"));
+	    configuration.setAllowCredentials(true);
 
-		configuration.setAllowedHeaders(List.of("*"));
+	    UrlBasedCorsConfigurationSource source =
+	            new UrlBasedCorsConfigurationSource();
 
-		configuration.setAllowCredentials(true);
+	    source.registerCorsConfiguration("/**", configuration);
 
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-
-		source.registerCorsConfiguration("/**", configuration);
-
-		return source;
+	    return source;
 	}
 
 
