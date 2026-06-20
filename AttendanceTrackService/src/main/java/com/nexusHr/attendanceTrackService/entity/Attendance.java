@@ -3,7 +3,6 @@ package com.nexusHr.attendanceTrackService.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import com.nexusHr.employeeService.entity.Employee;
 
 import jakarta.persistence.*;
 
