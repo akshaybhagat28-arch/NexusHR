@@ -2,7 +2,6 @@ package com.nexusHr.leaveManagementService.entity;
 
 import java.time.LocalDate;
 
-import com.nexusHr.authService.entity.User;
 import com.nexusHr.employeeService.entity.Employee;
 
 import jakarta.persistence.Entity;
@@ -36,17 +35,17 @@ public class LeaveRequest {
 
 	private Boolean paid;
 
-	   @ManyToOne
-	    @JoinColumn(name = "employee_id") // employee table ki FK
-	    private Employee employee;
+	@ManyToOne
+	@JoinColumn(name = "employee_id")
+	private Employee employee;
+	private Long employeeId;
 
 	public LeaveRequest() {
 		super();
 	}
 
-
 	public LeaveRequest(Long id, LocalDate startDate, LocalDate endDate, LeaveStatus status, String reason,
-			String approvedBy, Integer totalDays, Boolean paid, Employee employee) {
+			String approvedBy, Integer totalDays, Boolean paid, Employee employee, Long employeeId) {
 		super();
 		this.id = id;
 		this.startDate = startDate;
@@ -57,8 +56,8 @@ public class LeaveRequest {
 		this.totalDays = totalDays;
 		this.paid = paid;
 		this.employee = employee;
+		this.employeeId = employeeId;
 	}
-
 
 	public Long getId() {
 		return id;
@@ -108,12 +107,6 @@ public class LeaveRequest {
 		this.approvedBy = approvedBy;
 	}
 
-
-	public Employee getEmployee() {
-		return employee;
-	}
-
-
 	public Integer getTotalDays() {
 		return totalDays;
 	}
@@ -130,10 +123,20 @@ public class LeaveRequest {
 		this.paid = paid;
 	}
 
+	public Employee getEmployee() {
+		return employee;
+	}
 
 	public void setEmployee(Employee employee) {
 		this.employee = employee;
 	}
 
+	public Long getEmployeeId() {
+		return employeeId;
+	}
+
+	public void setEmployeeId(Long employeeId) {
+		this.employeeId = employeeId;
+	}
 
 }

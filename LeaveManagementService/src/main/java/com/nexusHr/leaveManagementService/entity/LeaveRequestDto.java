@@ -2,15 +2,6 @@ package com.nexusHr.leaveManagementService.entity;
 
 import java.time.LocalDate;
 
-import com.nexusHr.employeeService.entity.Employee;
-
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 
 public class LeaveRequestDto {
 
