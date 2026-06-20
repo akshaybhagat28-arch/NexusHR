@@ -145,7 +145,7 @@ export default function ApplyLeave() {
               }
               placeholder="Enter Leave Reason"
               required
-              rows="3"
+              rows={3}
               className="w-full p-3 rounded-xl bg-gray-800 text-white outline-none border border-gray-700"
             />
 
