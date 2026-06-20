@@ -74,7 +74,7 @@ public class SecurityConfig {
 
 		CorsConfiguration configuration = new CorsConfiguration();
 
-		configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+		configuration.setAllowedOrigins(List.of("https://nexus-hr-project.vercel.app"));
 
 		configuration.setAllowedMethods(List.of("*"));
 
@@ -88,6 +88,7 @@ public class SecurityConfig {
 
 		return source;
 	}
+
 
 	@Bean
 	PasswordEncoder passwordEncoder() {
