@@ -1,9 +1,11 @@
-import { useState } from "react";
+
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useState, type FormEvent } from "react";
 
 // IMPORT IMAGE
 import bgImage from "./assets/t3.jpg";
+
 
 export default function ApplyLeave() {
 
@@ -24,7 +26,9 @@ export default function ApplyLeave() {
     useState(false);
 
   // APPLY LEAVE
-  const applyLeave = async (e) => {
+  const applyLeave = async (
+  e: FormEvent<HTMLFormElement>
+) => {
 
     e.preventDefault();
 
@@ -59,7 +63,7 @@ export default function ApplyLeave() {
       console.log(error);
 
       alert("Unable To Apply Leave");
-      alert("TOKEN => ", token);
+      
     }
   };
 

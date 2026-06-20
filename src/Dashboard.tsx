@@ -3,12 +3,31 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
+  interface Department {
+  departmentName: string;
+}
+
+interface Employee {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  basicSalary: number;
+  department?: Department;
+}
+
+interface Leave {
+  id: number;
+  fromDate: string;
+  toDate: string;
+  reason: string;
+  status: string;
+}
 
   const navigate = useNavigate();
 
-  const [employees, setEmployees] = useState([]);
-
-  const [leaves, setLeaves] = useState([]);
+ const [employees, setEmployees] = useState<Employee[]>([]);
+const [leaves, setLeaves] = useState<Leave[]>([]);
 
   // GET TOKEN
   const token = localStorage.getItem("token");

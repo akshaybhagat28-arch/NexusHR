@@ -4,12 +4,41 @@ import { useNavigate } from "react-router-dom";
 
 export default function EmployeeDashboard() {
 
+  interface Employee {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  basicSalary: number;
+}
+
+interface Attendance {
+  id: number;
+  date: string;
+  status: string;
+}
+
+interface Leave {
+  id: number;
+  fromDate: string;
+  toDate: string;
+  reason: string;
+  status: string;
+}
+
+interface Review {
+  id: number;
+  feedback: string;
+  rating: number;
+  reviewDate: string;
+}
+
   const navigate = useNavigate();
 
-  const [employee, setEmployee] = useState(null);
-  const [attendance, setAttendance] = useState([]);
-  const [leaves, setLeaves] = useState([]);
-  const [reviews, setReviews] = useState([]);
+ const [employee, setEmployee] = useState<Employee | null>(null);
+const [attendance, setAttendance] = useState<Attendance[]>([]);
+const [leaves, setLeaves] = useState<(string | number)[][]>([]);
+const [reviews, setReviews] = useState<Review[]>([]);
 
   const token = localStorage.getItem("token");
 
@@ -150,6 +179,7 @@ const approvedLeaves = leaves.filter(
 const pendingLeaves = leaves.filter(
   (leave) => leave[7] === "PENDING"
 ).length;
+
 
 const averageRating =
   reviews.length > 0

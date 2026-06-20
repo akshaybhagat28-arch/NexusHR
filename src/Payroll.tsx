@@ -8,9 +8,15 @@ import bgImage from "./assets/t3.jpg";
 
 export default function Payroll() {
 
-  const navigate = useNavigate();
+  interface Employee {
+  id: number;
+  firstName: string;
+  lastName: string;
+}
 
-  const [employees, setEmployees] = useState([]);
+const [employees, setEmployees] = useState<Employee[]>([]);
+
+  const navigate = useNavigate();
 
   const [selectedEmployeeId, setSelectedEmployeeId] =
     useState("");
@@ -70,7 +76,7 @@ export default function Payroll() {
 
   // SELECTED EMPLOYEE
   const selectedEmployee = employees.find(
-    (emp) => emp.id == selectedEmployeeId
+    (emp) => emp.id == Number(selectedEmployeeId)
   );
 
   // GENERATE PAYSLIP
@@ -116,7 +122,7 @@ export default function Payroll() {
 
       link.setAttribute(
         "download",
-        `${selectedEmployee.firstName}_${month}_Payslip.pdf`
+        `${selectedEmployee?.firstName}_${month}_Payslip.pdf`
       );
 
       document.body.appendChild(link);
