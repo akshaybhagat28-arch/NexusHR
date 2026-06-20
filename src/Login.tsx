@@ -21,12 +21,12 @@ export default function Login() {
     try {
 
       const response = await axios.post(
-        "http://localhost:8080/api/payroll/login",
-        {
-          username,
-          password,
-        }
-      );
+  "https://nexushr-backend.onrender.com/api/payroll/login",
+  {
+    username,
+    password
+  }
+);
 
       // TOKEN SAVE
       localStorage.setItem(
