@@ -16,7 +16,7 @@ import com.nexusHr.leaveManagementService.service.LeaveService;
 
 @RestController
 @RequestMapping("/api/leaves")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "https://nexus-hr-project.vercel.app")
 public class LeavesControllers {
 
 	@Autowired

@@ -12,7 +12,7 @@ import com.nexusHr.payrollService.service.PerformanceReviewService;
 
 @RestController
 @RequestMapping("/api/reviews")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "https://nexus-hr-project.vercel.app")
 public class PerformanceReviewController {
 
 	@Autowired

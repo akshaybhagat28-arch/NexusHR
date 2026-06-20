@@ -14,9 +14,7 @@ import com.nexusHr.payrollService.service.EmployeeService;
 
 @RestController
 @RequestMapping("/api/employee")
-@CrossOrigin(
-	    origins = "http://localhost:5173"
-	)
+@CrossOrigin(origins = "https://nexus-hr-project.vercel.app")
 public class EmployeeControllers {
 
     @Autowired
