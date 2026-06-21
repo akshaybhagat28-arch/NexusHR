@@ -38,14 +38,13 @@ public class LeaveRequest {
 	@ManyToOne
 	@JoinColumn(name = "employee_id")
 	private Employee employee;
-	private Long employeeId;
 
 	public LeaveRequest() {
 		super();
 	}
 
 	public LeaveRequest(Long id, LocalDate startDate, LocalDate endDate, LeaveStatus status, String reason,
-			String approvedBy, Integer totalDays, Boolean paid, Employee employee, Long employeeId) {
+			String approvedBy, Integer totalDays, Boolean paid, Employee employee) {
 		super();
 		this.id = id;
 		this.startDate = startDate;
@@ -56,8 +55,9 @@ public class LeaveRequest {
 		this.totalDays = totalDays;
 		this.paid = paid;
 		this.employee = employee;
-		this.employeeId = employeeId;
 	}
+
+
 
 	public Long getId() {
 		return id;
@@ -129,14 +129,6 @@ public class LeaveRequest {
 
 	public void setEmployee(Employee employee) {
 		this.employee = employee;
-	}
-
-	public Long getEmployeeId() {
-		return employeeId;
-	}
-
-	public void setEmployeeId(Long employeeId) {
-		this.employeeId = employeeId;
 	}
 
 }
