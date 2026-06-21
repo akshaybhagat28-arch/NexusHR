@@ -21,12 +21,12 @@ export default function Login() {
     try {
 
       const response = await axios.post(
-  "https://nexushr-backend.onrender.com/api/payroll/login",
-  {
-    username,
-    password
-  }
-);
+        "https://nexus-hr-project-7wwyy714-akshaybhagat28-1992s-projects.vercel.app",
+        {
+          username,
+          password,
+        }
+      );
 
       // TOKEN SAVE
       localStorage.setItem(
